@@ -138,6 +138,16 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 
 ---
 
+## Enhancement Backlog（Observability / Reliability / Deployment）
+
+- [ ] OBS-001 植入核心 span：`ai.llm.request`、`pii.mask`、`sop.build`、`weekly.run`、`export.markdown`，並紀錄 redaction 指標。
+- [ ] OBS-002 發送核心事件：`conversation.started`、`sop.draft_created`、`sop.draft_reviewed`、`pdca.session_completed`、`weekly_review.generated`、`export.markdown_succeeded`，同步更新 `metrics-map`。
+- [ ] DB-001 依 `docs/deployment-profile.md` 補強資料 schema（core/audit/system）、索引命名與 RLS 規則，更新 migration。
+- [ ] REL-001 實作 BullMQ 重試 + Incident 升級流程，串接 Slack/Email 通知並記錄 `incident.*` 事件。
+- [ ] CD-001 建立 Dev/Staging/Prod K8s manifests（含 HPA、Readiness/Liveness、環境變數白名單）並整合 CI/CD。
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
