@@ -15,6 +15,12 @@ dist/
 build/
 out/
 .cache/
+coverage/
+
+# Next.js
+.next/
+apps/web/.next/
+apps/web/out/
 
 # Environment & virtualenvs
 .env

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "paths": {
+      "@aisop/domain": ["packages/domain/src"],
+      "@aisop/infra": ["packages/infra/src"],
+      "@aisop/workflows": ["packages/workflows/src"],
+      "@aisop/telemetry": ["packages/telemetry/src"]
+    }
+  },
+  "include": []
+}
+

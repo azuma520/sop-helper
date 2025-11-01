@@ -37,11 +37,11 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 
 **Purpose**: 建立 monorepo 基礎結構與開發工作流程。
 
-- [ ] T001 Create pnpm workspace with `apps/`、`packages/`、`tests/` skeleton; 初始化 `package.json` scripts（`pnpm dev:api`, `pnpm dev:web`, `pnpm dev:worker`）。
-- [ ] T002 建立 `apps/api` NestJS scaffold（REST + OpenAPI），並於 README 記錄啟動指令及行動追蹤連結。
-- [ ] T003 建立 `apps/web` Next.js 14 App Router scaffold，整合 Tailwind/Chakra（若選用）與國際化設定。
-- [ ] T004 [P] 設定 `packages/domain`、`packages/infra`、`packages/workflows`、`packages/telemetry` 專案骨架與共用 ESLint/Prettier 設定。
-- [ ] T005 撰寫 `docs/guardrails/actions.md`，描述行動項紀錄方式、審核流程與 reviewer 名單。
+- [x] T001 Create pnpm workspace with `apps/`、`packages/`、`tests/` skeleton; 初始化 `package.json` scripts（`pnpm dev:api`, `pnpm dev:web`, `pnpm dev:worker`）。
+- [x] T002 建立 `apps/api` NestJS scaffold（REST + OpenAPI），並於 README 記錄啟動指令及行動追蹤連結。
+- [x] T003 建立 `apps/web` Next.js 14 App Router scaffold，整合 Tailwind/Chakra（若選用）與國際化設定。
+- [x] T004 [P] 設定 `packages/domain`、`packages/infra`、`packages/workflows`、`packages/telemetry` 專案骨架與共用 ESLint/Prettier 設定。
+- [x] T005 撰寫 `docs/guardrails/actions.md`，描述行動項紀錄方式、審核流程與 reviewer 名單。
 
 ---
 
@@ -49,13 +49,15 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 
 **Purpose**: 建立後端核心能力，確保資料治理、遮罩與審核留痕到位。**⚠️ 完成前不可開始使用者故事開發。**
 
-- [ ] T006 設計 PostgreSQL schema 與 migration（users/organizations/inbox_items/actions/projects/sops/sop_versions/pdca/weekly_reviews/tags/audit_logs），加上必要索引與 RLS 政策。
-- [ ] T007 [P] 實作 `packages/infra/db`（Prisma/TypeORM 選擇）並設定審計欄位與多租戶過濾。
-- [ ] T008 [P] 建立 `packages/infra/masking`：提供 LLM 前遮罩函式、redactions 記錄與單元測試。
+- [x] T006 設計 PostgreSQL schema 與 migration（users/organizations/inbox_items/actions/projects/sops/sop_versions/pdca/weekly_reviews/tags/audit_logs），加上必要索引與 RLS 政策。
+- [x] T007 [P] 實作 `packages/infra/db`（Prisma/TypeORM 選擇）並設定審計欄位與多租戶過濾。
+- [x] T008 [P] 建立 `packages/infra/masking`：提供 LLM 前遮罩函式、redactions 記錄與單元測試。
 - [ ] T009 建構 `packages/telemetry`（OpenTelemetry SDK + Grafana Cloud 匯流設定），並新增 `docs/observability.md` 說明。
 - [ ] T010 實作 BullMQ + node-cron 基礎流程（`packages/workflows/scheduler`），含 10m/60m 重試與任務審計表。
 - [ ] T011 [P] 建立 API Gateway / AuthN 結構（JWT/OIDC middleware、RBAC decorator、Rate limit policy 在 `apps/api/src/common/`）。
 - [ ] T012 導入 `contracts/openapi.yaml` 為 NestJS OpenAPI 來源，並新增 CI 腳本 `pnpm test:contract`（Dredd）。
+- [ ] T012A [P] 建立 `packages/domain/tagging` 與 `packages/infra/tagging`：定義標籤建議輸入/輸出模型、Reviewer 審核欄位與審計記錄。
+- [ ] T012B 建立 `apps/api/src/tags` 模組：串接遮罩後的 LLM 建議、儲存候選標籤、提供覆核/commit API，並撰寫單元測試。
 
 **Checkpoint**: DB schema 部署、遮罩、觀測、排程、認證皆完成並具單元測試。
 
@@ -76,6 +78,7 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [ ] T018 建置 `apps/web/app/conversation` UI：支援模板引導、常見錯誤提示與 Reviewer 審核工作流。
 - [ ] T019 [P] 建立 `packages/infra/audit`，在對話 & SOP API 進入點記錄 `AuditLog`（含 prompt_version、redactions）。
 - [ ] T020 [US1] 補齊 `docs/conversation-flow.md`：記錄最小可用流程、範例、審核清單。
+- [ ] T020A [P] 於對話流程與 SOP 建立事件追蹤（意圖命中／誤判／覆核結果），寫入 telemetry 與 PDCA 資料來源。
 
 **Checkpoint**: 對話→行動→SOP 草稿流程可演示，所有輸出皆為 Markdown + JSON 並具審核留痕。
 
@@ -116,6 +119,7 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [ ] T034 [US3] 完成 SOP Markdown 匯出模組（`packages/infra/export`）：產生 Frontmatter + Diff、上傳 S3、寫入版本審核紀錄。
 - [ ] T035 [P] 建立 `packages/infra/notifications`（Email/SMS/In-app 模組），整合 action log 與 fallback 機制。
 - [ ] T036 更新 `docs/weekly-review.md`：記錄 Cron 設定、通知流程、審核責任與常見錯誤處理。
+- [ ] T036A [US3] 在週回顧生成流程中加入意圖命中率、AI 建議覆核統計，並於草稿中呈現異常趨勢。
 
 **Checkpoint**: 週五 Cron 成功生成草稿、推送通知並支援轉換；匯出成功率與審核留痕符合成功指標。
 
@@ -130,6 +134,7 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [ ] T039 進行 k6 壓力測試與 LLM latency 模擬，調整排程與佇列設定；於 `docs/perf-report.md` 記錄結果。
 - [ ] T040 [P] 彙整 PDCA / 週回顧指標進 Grafana Dashboard，並排程每週回顧會議。
 - [ ] T041 [US1][US2][US3] 行動項整理：確認所有未完成/審核行動在任務完成前清零，並在 PDCA 中記錄學習心得。
+- [ ] T042 [P] 建立「意圖命中率 & 標籤覆核」儀表板（Grafana），納入告警門檻並在 `docs/observability.md` 補充操作指引。
 
 ---
 

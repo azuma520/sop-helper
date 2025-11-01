@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Prisma model definitions are provided for reference. We will rely on SQL migrations
+// (apps/api/prisma/migrations/001_init/step.sql) to express RLS and advanced constraints.
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  plan      String   @default("mvp")
+  createdAt DateTime @default(now())
+
+  users          User[]
+  inboxItems     InboxItem[]
+  actions        Action[]
+  projects       Project[]
+  sops           SOP[]
+  pdcas          PDCA[]
+  weeklyReviews  WeeklyReview[]
+  tags           Tag[]
+  auditLogs      AuditLog[]
+}
+
+model User {
+  id         String   @id @default(uuid())
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId      String
+  email      String   @unique
+  name       String
+  role       UserRole
+  timezone   String   @default("Asia/Taipei")
+  preferences Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  inboxItems InboxItem[]
+  actionsOwned Action[] @relation("ActionOwner")
+  actionsReviewed Action[] @relation("ActionReviewer")
+  sopsCreated SOP[] @relation("SOPCreator")
+  sopsReviewed SOP[] @relation("SOPReviewer")
+  pdcasCreated PDCA[] @relation("PDCACreator")
+  pdcasReviewed PDCA[] @relation("PDCAReviewer")
+  weeklyReviews WeeklyReview[]
+  auditLogs AuditLog[]
+  projectsOwned Project[] @relation("ProjectOwner")
+  sopVersionsReviewed SOPVersion[] @relation("SOPVersionReviewer")
+}
+
+enum UserRole {
+  creator
+  reviewer
+  viewer
+}
+
+model InboxItem {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  text      String
+  status    InboxStatus @default(draft)
+  linkedSop SOP?        @relation("InboxLinkedSOP", fields: [linkedSopId], references: [id])
+  linkedSopId String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  actionsFromInbox Action[] @relation("ActionSourceInbox")
+}
+
+enum InboxStatus {
+  draft
+  archived
+}
+
+model Action {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  title     String
+  description String?
+  owner     User     @relation("ActionOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  status    ActionStatus @default(pending)
+  dueAt     DateTime?
+  completedAt DateTime?
+  reviewer  User?    @relation("ActionReviewer", fields: [reviewerId], references: [id])
+  reviewerId String?
+  reviewedAt DateTime?
+  tags      Json?
+  usageCount Int      @default(0)
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+  sourceInbox InboxItem? @relation("ActionSourceInbox", fields: [sourceInboxId], references: [id])
+  sourceInboxId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sopLinks SOPActionLink[]
+}
+
+enum ActionStatus {
+  pending
+  in_review
+  done
+  blocked
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  title     String
+  objective String?
+  status    ProjectStatus @default(active)
+  tags      Json?
+  owner     User     @relation("ProjectOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  createdAt DateTime @default(now())
+  actions   Action[]
+  sops      SOP[]
+  pdcas     PDCA[]
+}
+
+enum ProjectStatus {
+  active
+  paused
+  completed
+}
+
+model SOP {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  title     String
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+  status    SOPStatus @default(draft)
+  currentVersion SOPVersion? @relation("CurrentVersion", fields: [currentVersionId], references: [id])
+  currentVersionId String? @unique
+  tags      Json?
+  notes     String?
+  createdBy User     @relation("SOPCreator", fields: [createdById], references: [id])
+  createdById String
+  reviewer   User?   @relation("SOPReviewer", fields: [reviewerId], references: [id])
+  reviewerId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  versions  SOPVersion[]
+  actionLinks SOPActionLink[]
+  pdcas     PDCA[]
+  linkedInboxItems InboxItem[] @relation("InboxLinkedSOP")
+}
+
+enum SOPStatus {
+  draft
+  in_review
+  approved
+  archived
+}
+
+model SOPVersion {
+  id        String   @id @default(uuid())
+  sop       SOP      @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  sopId     String
+  semver    String
+  contentMarkdown String
+  contentJson Json
+  diffJson   Json?
+  changeSummary String?
+  status    SOPVersionStatus @default(draft)
+  reviewedBy User?  @relation("SOPVersionReviewer", fields: [reviewedById], references: [id])
+  reviewedById String?
+  reviewedAt DateTime?
+  createdAt DateTime @default(now())
+  currentOf SOP? @relation("CurrentVersion")
+}
+
+enum SOPVersionStatus {
+  draft
+  pending_review
+  approved
+  superseded
+}
+
+model SOPActionLink {
+  sop     SOP     @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  sopId   String
+  action  Action  @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actionId String
+  ord     Int
+  meta    Json?
+
+  @@id([sopId, actionId])
+  @@unique([sopId, ord])
+}
+
+model PDCA {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  sop       SOP      @relation(fields: [sopId], references: [id], onDelete: Cascade)
+  sopId     String
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+  periodStart DateTime
+  periodEnd   DateTime
+  phasePlan   Json
+  phaseDo     Json
+  phaseCheck  Json
+  phaseAct    Json
+  diffJson    Json?
+  status      PDCAStatus @default(draft)
+  createdBy   User   @relation("PDCACreator", fields: [createdById], references: [id])
+  createdById String
+  reviewedBy  User?  @relation("PDCAReviewer", fields: [reviewedById], references: [id])
+  reviewedById String?
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+}
+
+enum PDCAStatus {
+  draft
+  in_review
+  closed
+}
+
+model WeeklyReview {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  weekNo    Int
+  weekStart DateTime
+  weekEnd   DateTime
+  summary   Json
+  outcomes  Json
+  issues    Json
+  nextActions Json
+  sourceStats Json?
+  linkedPdcaIds String[]
+  linkedSopVersionIds String[]
+  status    WeeklyReviewStatus @default(draft)
+  generatedAt DateTime?
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@unique([orgId, userId, weekNo])
+}
+
+enum WeeklyReviewStatus {
+  draft
+  published
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  namespace TagNamespace
+  value     String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+enum TagNamespace {
+  domain
+  role
+  phase
+  tool
+  risk
+  scope
+  free
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId     String
+  user      User?   @relation(fields: [userId], references: [id])
+  userId    String?
+  endpoint  String
+  method    String
+  requestId String
+  payloadHash String?
+  latencyMs Int
+  promptVersion String?
+  redactions Json?
+  createdAt DateTime @default(now())
+}
+

@@ -1,0 +1,23 @@
+{
+  "name": "@aisop/infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "prisma:generate": "prisma generate --schema ../../apps/api/prisma/schema.prisma",
+    "prisma:migrate:dev": "prisma migrate deploy --schema ../../apps/api/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.18.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.18.0",
+    "vitest": "^4.0.6"
+  }
+}
