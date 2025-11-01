@@ -54,6 +54,8 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [x] T008 [P] 建立 `packages/infra/masking`：提供 LLM 前遮罩函式、redactions 記錄與單元測試。
 - [x] T009 建構 `packages/telemetry`（OpenTelemetry SDK + Grafana Cloud 匯流設定），並新增 `docs/observability.md` 說明。
 - [x] T010 實作 BullMQ + node-cron 基礎流程（`packages/workflows/scheduler`），含 10m/60m 重試與任務審計表。
+- [ ] T010A [P] 更新 Prisma / SQL migration：`pdca` 表新增 `act_acknowledge_insight`、`act_action_change` 欄位並維持 RLS 與索引。
+- [ ] T010B 同步調整 `contracts/openapi.yaml`、`packages/domain/pdca` 型別與 `apps/api` DTO，支援新欄位。
 - [ ] T011 [P] 建立 API Gateway / AuthN 結構（JWT/OIDC middleware、RBAC decorator、Rate limit policy 在 `apps/api/src/common/`）。
 - [ ] T012 導入 `contracts/openapi.yaml` 為 NestJS OpenAPI 來源，並新增 CI 腳本 `pnpm test:contract`（Dredd）。
 - [ ] T012A [P] 建立 `packages/domain/tagging` 與 `packages/infra/tagging`：定義標籤建議輸入/輸出模型、Reviewer 審核欄位與審計記錄。
@@ -75,8 +77,12 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [ ] T015 建立 `apps/api/src/conversation` 模組：串接遮罩、提示模板、OpenAI GPT-4o mini，輸出結構化行動。
 - [ ] T016 [P] 在 `packages/domain` 定義 `ActionDraft`、`SOPDraft` 型別與驗證邏輯（含審核欄位、Frontmatter 片段）。
 - [ ] T017 更新 `apps/api/src/sops`：支援接收 draft actions、建立 SOP與 `SOPActionLink`、寫入審核記錄。
+- [ ] T017A [US1][US2] 擴充 `apps/api/src/pdca`：PATCH 支援 `act_acknowledge_insight`、`act_action_change`，產生 Diff 與審核紀錄。
 - [ ] T018 建置 `apps/web/app/conversation` UI：支援模板引導、常見錯誤提示與 Reviewer 審核工作流。
+- [ ] T018A [US1] 新增對話→卡片預覽側欄，顯示待送出 Action/SOP/PDCA 草稿並允許單筆審核。
+- [ ] T018B [US1] 導入語氣包（tone pack）與快捷鍵（Enter / Ctrl+Enter），預設填入 Owner/Due/Tags。
 - [ ] T019 [P] 建立 `packages/infra/audit`，在對話 & SOP API 進入點記錄 `AuditLog`（含 prompt_version、redactions）。
+- [ ] T019A [US1] 確保所有自動產出皆以 `draft` 狀態儲存並需要 Reviewer 審核才能升級。
 - [ ] T020 [US1] 補齊 `docs/conversation-flow.md`：記錄最小可用流程、範例、審核清單。
 - [ ] T020A [P] 於對話流程與 SOP 建立事件追蹤（意圖命中／誤判／覆核結果），寫入 telemetry 與 PDCA 資料來源。
 
@@ -96,6 +102,7 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [ ] T023 擴充 `apps/api/src/inbox`：提供 Inbox→Action 兩步轉換 API，建立行動項與 Project 關聯。
 - [ ] T024 [P] 實作 `apps/api/src/actions/library`：Action 重用、usage_count++、行動審核紀錄更新。
 - [ ] T025 [US2] 在 `apps/api/src/pdca` 新增問答、Diff 生成與 vNext 建立；整合 `packages/domain/pdca` 邏輯。
+- [ ] T025A [US2] 建立 `/pdca/check`、`/pdca/{id}` Flow：串接新 A1/A2 欄位、更新 Diff 與 reviewer checklists。
 - [ ] T026 [P] 更新 `apps/web/app/projects/[id]` 頁面：顯示 SOP、行動、PDCA 列表與待審核提示。
 - [ ] T027 實作 `packages/workflows/pdca-reminder`：每日 09:00 掃描 30 天未更新的 SOP，建立新行動項並通知。
 - [ ] T028 [US2] 更新 `docs/pdca-diff.md`：紀錄 Diff 規則、審核步驟、PDCA 與 SOP 版本映射。
