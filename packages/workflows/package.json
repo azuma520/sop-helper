@@ -9,9 +9,13 @@
     "build": "tsc -p tsconfig.json",
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "lint": "eslint .",
-    "test": "echo \"(workflows) no tests yet\""
+    "test": "vitest run"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "bullmq": "^5.63.0",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.6"
+  }
 }
-
