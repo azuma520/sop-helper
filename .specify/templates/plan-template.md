@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- 行動優先：說明此功能的所有輸入如何先轉成具體行動項（Action），含負責人、完成條件與追蹤機制。
+- 最小可用：定義最小可用版本的交付內容，證明可於 3 分鐘內示範並標示下一次改進假設。
+- 持續演化：描述此功能的 PDCA 迭代節奏與每週五 16:00 回顧所需資料，含失敗時的補救流程。
+- 結構透明：確認輸出（SOP、文件、日誌）皆為 Markdown + Frontmatter 或可機器解析格式，並列出審計需求。
+- 認知節能與人類審核：標記 Reviewer 清單、人類審核節點與降低操作步驟的設計（模板、預填、提示）。
 
 ## Project Structure
 

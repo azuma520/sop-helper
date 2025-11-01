@@ -12,6 +12,13 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+**Constitution Guardrails**:
+- 行動優先：為每個任務建立對應的行動項（Action），標註負責人與完成條件。
+- 最小可用：先交付可在 3 分鐘內驗證的最小版本，後續優化另建任務。
+- 持續演化：在相關任務中加入 PDCA 條目更新與週五回顧準備工作。
+- 結構透明：在任務描述中指定 Markdown + Frontmatter 與 JSON 雙格式輸出。
+- 認知節能與人類審核：標示 Reviewer 審核點與降低操作步驟的自動化需求。
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -49,8 +56,9 @@ description: "Task list template for feature implementation"
 **Purpose**: Project initialization and basic structure
 
 - [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T002 Initialize [language] project with [framework] dependencies，並建立對應行動項追蹤最小可用交付
+- [ ] T003 [P] Configure linting and formatting tools，整合 Markdown/JSON 輸出驗證腳本
+- [ ] T004 [P] Document reviewer checkpoints and automation prompts in docs/guardrails.md
 
 ---
 
@@ -62,12 +70,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T005 Setup database schema and migrations framework，啟用 RLS 與審計欄位
+- [ ] T006 [P] Implement authentication/authorization framework with PII masking hooks
+- [ ] T007 [P] Setup API routing and middleware structure，串接 API Gateway 驗證
+- [ ] T008 Create base models/entities that all stories depend on，包含 PDCA 與行動追蹤欄位
+- [ ] T009 Configure error handling and logging infrastructure，輸出結構化日誌
+- [ ] T010 Setup environment configuration management，記錄金鑰滾動流程
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +91,18 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T011 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py，驗證 Markdown/JSON 雙格式
+- [ ] T012 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py，覆蓋行動與審核流程
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T013 [P] [US1] Create [Entity1] model in src/models/[entity1].py（含 PDCA 狀態欄位）
+- [ ] T014 [P] [US1] Create [Entity2] model in src/models/[entity2].py（含審核紀錄關聯）
+- [ ] T015 [US1] Implement [Service] in src/services/[service].py (depends on T013, T014)
+- [ ] T016 [US1] Implement [endpoint/feature] in src/[location]/[file].py，確保輸出雙格式
+- [ ] T017 [US1] Add validation and error handling，涵蓋 PII 遮罩
+- [ ] T018 [US1] Add logging for user story 1 operations，含審核留痕
+- [ ] T019 [US1] Prepare weekly review snapshot data
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
