@@ -1,0 +1,669 @@
+openapi: 3.1.0
+info:
+  title: AI SOP MVP API
+  version: 0.1.0
+  description: REST API for conversational SOP generation, PDCA management, and weekly reviews.
+servers:
+  - url: https://api.example.com/api/v1
+    description: Production
+  - url: http://localhost:4000/api/v1
+    description: Development
+tags:
+  - name: Conversation
+  - name: SOPs
+  - name: PDCA
+  - name: Actions
+  - name: Tags
+  - name: WeeklyReview
+  - name: Auth
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    SopId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PdcaId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    WeeklyReviewId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ActionCard:
+      type: object
+      required: [id, title, description, ownerId, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, in_review, done, blocked]
+        dueAt:
+          type: string
+          format: date-time
+        tags:
+          type: object
+          additionalProperties: true
+    SOP:
+      type: object
+      required: [id, title, status, tags]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        projectId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [draft, in_review, approved, archived]
+        tags:
+          type: object
+          properties:
+            domain:
+              type: string
+            role:
+              type: string
+            phase:
+              type: string
+            tool:
+              type: string
+            risk:
+              type: string
+            scope:
+              type: string
+            free:
+              type: array
+              items:
+                type: string
+        notes:
+          type: string
+        currentVersion:
+          $ref: '#/components/schemas/SOPVersion'
+    SOPVersion:
+      type: object
+      required: [id, sopId, semver, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sopId:
+          type: string
+          format: uuid
+        semver:
+          type: string
+        status:
+          type: string
+          enum: [draft, pending_review, approved, superseded]
+        contentMarkdown:
+          type: string
+        contentJson:
+          type: object
+        diffJson:
+          type: object
+        changeSummary:
+          type: string
+        reviewedBy:
+          type: string
+          format: uuid
+        reviewedAt:
+          type: string
+          format: date-time
+    PDCA:
+      type: object
+      required: [id, sopId, periodStart, periodEnd, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sopId:
+          type: string
+          format: uuid
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [draft, in_review, closed]
+        phasePlan:
+          type: object
+        phaseDo:
+          type: object
+        phaseCheck:
+          type: object
+        phaseAct:
+          type: object
+        diffJson:
+          type: object
+    WeeklyReview:
+      type: object
+      required: [id, weekNo, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        weekNo:
+          type: integer
+        status:
+          type: string
+          enum: [draft, published]
+        summary:
+          type: object
+        outcomes:
+          type: object
+        issues:
+          type: object
+        nextActions:
+          type: object
+        linkedPdcaIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        linkedSopVersionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+security:
+  - bearerAuth: []
+
+paths:
+  /conversation/parse:
+    post:
+      tags: [Conversation]
+      summary: Convert natural language input into structured action draft.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Generated draft actions and suggestions.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActionCard'
+                  cautions:
+                    type: array
+                    items:
+                      type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  /sops:
+    get:
+      tags: [SOPs]
+      summary: List SOPs with filtering and pagination.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: tag.domain
+          schema:
+            type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: SOP list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SOP'
+                  total:
+                    type: integer
+    post:
+      tags: [SOPs]
+      summary: Create SOP draft from action cards.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, actions]
+              properties:
+                title:
+                  type: string
+                projectId:
+                  type: string
+                  format: uuid
+                actions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ActionCard'
+                tags:
+                  type: object
+      responses:
+        '201':
+          description: SOP draft created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOP'
+
+  /sops/{id}:
+    get:
+      tags: [SOPs]
+      summary: Get SOP detail with latest version.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      responses:
+        '200':
+          description: SOP detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOP'
+    patch:
+      tags: [SOPs]
+      summary: Update SOP draft metadata or actions.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                tags:
+                  type: object
+                notes:
+                  type: string
+                actions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ActionCard'
+      responses:
+        '200':
+          description: SOP updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOP'
+
+  /sops/{id}/submit:
+    post:
+      tags: [SOPs]
+      summary: Submit SOP for review.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      responses:
+        '202':
+          description: SOP moved to review.
+
+  /sops/{id}/approve:
+    post:
+      tags: [SOPs]
+      summary: Approve SOP and finalize version.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                semver:
+                  type: string
+                changeSummary:
+                  type: string
+      responses:
+        '200':
+          description: SOP version approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOPVersion'
+
+  /sops/{id}/versions:
+    get:
+      tags: [SOPs]
+      summary: List SOP versions.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      responses:
+        '200':
+          description: SOP version list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SOPVersion'
+    post:
+      tags: [SOPs]
+      summary: Create vNext SOP draft from diff result.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [diffJson, changeSummary]
+              properties:
+                diffJson:
+                  type: object
+                changeSummary:
+                  type: string
+      responses:
+        '201':
+          description: New SOP version draft created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SOPVersion'
+
+  /sops/{id}/export.md:
+    get:
+      tags: [SOPs]
+      summary: Export SOP as Markdown with Frontmatter.
+      parameters:
+        - $ref: '#/components/parameters/SopId'
+      responses:
+        '200':
+          description: Markdown export.
+          content:
+            text/markdown:
+              schema:
+                type: string
+
+  /pdca:
+    post:
+      tags: [PDCA]
+      summary: Create PDCA record and link to SOP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sopId, periodStart, periodEnd, plan, do, check, act]
+              properties:
+                sopId:
+                  type: string
+                  format: uuid
+                periodStart:
+                  type: string
+                  format: date
+                periodEnd:
+                  type: string
+                  format: date
+                plan:
+                  type: object
+                do:
+                  type: object
+                check:
+                  type: object
+                act:
+                  type: object
+      responses:
+        '201':
+          description: PDCA created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PDCA'
+    get:
+      tags: [PDCA]
+      summary: List PDCA entries.
+      parameters:
+        - in: query
+          name: sopId
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: PDCA list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PDCA'
+
+  /pdca/{id}/diff:
+    post:
+      tags: [PDCA]
+      summary: Generate SOP diff draft from PDCA insights.
+      parameters:
+        - $ref: '#/components/parameters/PdcaId'
+      responses:
+        '200':
+          description: Diff preview.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  diffJson:
+                    type: object
+
+  /actions:
+    post:
+      tags: [Actions]
+      summary: Create reusable action card.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: object
+      responses:
+        '201':
+          description: Action created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionCard'
+    get:
+      tags: [Actions]
+      summary: List reusable actions.
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Action list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActionCard'
+
+  /tags/suggest:
+    post:
+      tags: [Tags]
+      summary: Suggest tags based on text/context.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Suggested tags awaiting reviewer approval.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        namespace:
+                          type: string
+                        value:
+                          type: string
+                        confidence:
+                          type: number
+
+  /tags/commit:
+    post:
+      tags: [Tags]
+      summary: Commit approved tags to SOP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sopId, tags]
+              properties:
+                sopId:
+                  type: string
+                  format: uuid
+                tags:
+                  type: object
+      responses:
+        '200':
+          description: Tags stored.
+
+  /weekly-review:
+    get:
+      tags: [WeeklyReview]
+      summary: List weekly reviews with filters.
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: week
+          schema:
+            type: string
+            description: ISO week number e.g. 2025-W45
+      responses:
+        '200':
+          description: Weekly review list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeeklyReview'
+    post:
+      tags: [WeeklyReview]
+      summary: Manually trigger a weekly review draft.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [week]
+              properties:
+                week:
+                  type: string
+                rerun:
+                  type: boolean
+      responses:
+        '201':
+          description: Weekly review draft created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyReview'
+
+  /weekly-review/{id}/publish:
+    post:
+      tags: [WeeklyReview]
+      summary: Publish weekly review after reviewer confirmation.
+      parameters:
+        - $ref: '#/components/parameters/WeeklyReviewId'
+      responses:
+        '200':
+          description: Weekly review published.
+

@@ -1,0 +1,30 @@
+# SOP helper Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-11-01
+
+## Active Technologies
+
+- TypeScript (Node.js 20 LTS) for backend, TypeScript (Next.js 14) for frontend + NestJS (API), Next.js (SSR/SPA), PostgreSQL, Redis (BullMQ), OpenAI GPT-4o mini, OpenTelemetry, S3-compatible storage, node-cron (001-ai-sop-mvp)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+npm test; npm run lint
+
+## Code Style
+
+TypeScript (Node.js 20 LTS) for backend, TypeScript (Next.js 14) for frontend: Follow standard conventions
+
+## Recent Changes
+
+- 001-ai-sop-mvp: Added TypeScript (Node.js 20 LTS) for backend, TypeScript (Next.js 14) for frontend + NestJS (API), Next.js (SSR/SPA), PostgreSQL, Redis (BullMQ), OpenAI GPT-4o mini, OpenTelemetry, S3-compatible storage, node-cron
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
