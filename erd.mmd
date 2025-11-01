@@ -1,0 +1,99 @@
+erDiagram
+USERS ||--o{ WEEKLY_REVIEWS : owns
+USERS ||--o{ SOPS : creates
+USERS ||--o{ ACTIONS : creates
+USERS ||--o{ PROJECTS : creates
+SOPS ||--|{ SOP_VERSIONS : has
+SOPS ||--o{ PDCA : has
+SOPS ||--o{ SOP_ACTION_LINKS : composed_of
+ACTIONS ||--o{ SOP_ACTION_LINKS : linked_by
+PROJECTS ||--o{ SOPS : groups
+
+
+USERS {
+uuid id PK
+text name
+text email
+text role
+uuid org_id
+text tz
+}
+SOPS {
+uuid id PK
+text title
+uuid project_id FK
+text status
+text version
+jsonb tags
+text notes
+timestamptz updated_at
+uuid created_by
+}
+SOP_VERSIONS {
+uuid id PK
+uuid sop_id FK
+text semver
+jsonb diff
+text change_summary
+text status
+uuid reviewed_by
+timestamptz reviewed_at
+}
+ACTIONS {
+uuid id PK
+text title
+text description
+jsonb tags
+int usage_count
+uuid created_by
+}
+SOP_ACTION_LINKS {
+uuid sop_id FK
+uuid action_id FK
+int ord
+jsonb meta
+}
+PROJECTS {
+uuid id PK
+text title
+text objective
+jsonb tags
+uuid created_by
+}
+PDCA {
+uuid id PK
+uuid sop_id FK
+date period_start
+date period_end
+jsonb p
+jsonb d
+jsonb c
+jsonb a
+jsonb diff
+uuid created_by
+}
+INBOX_ITEMS {
+uuid id PK
+uuid user_id FK
+text text
+uuid linked_sop_id
+text status
+timestamptz created_at
+}
+WEEKLY_REVIEWS {
+uuid id PK
+uuid user_id FK
+int week_no
+date week_start
+date week_end
+jsonb summary
+jsonb outcomes
+jsonb issues
+jsonb next_actions
+jsonb source_stats
+uuid[] linked_pdca_ids
+uuid[] linked_sop_diff_ids
+text status
+timestamptz generated_at
+timestamptz published_at
+}

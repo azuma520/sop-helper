@@ -1,0 +1,11 @@
+```mermaid
+sequenceDiagram
+  participant UI
+  participant PD as PDCA Svc
+  participant SOP as SOP Svc
+  UI->>PD: POST /pdca (P/D/C/A)
+  PD->>SOP: GET /sop/:id (current)
+  PD->>PD: compute diff(old, suggestions)
+  PD-->>UI: diff preview
+  UI->>SOP: POST /sop/:id/version (vNext draft)
+```

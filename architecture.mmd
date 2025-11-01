@@ -1,0 +1,14 @@
+```mermaid
+flowchart LR
+  UI[Web UI] --> AGW[API Gateway]
+  AGW --> CONV[Conversation Svc]
+  AGW --> SOP[SOP Svc]
+  AGW --> PDCA[PDCA Svc]
+  AGW --> TAG[Tagging Svc]
+  AGW --> WR[Weekly Review Svc]
+  CONV --> MASK[PII Masking] --> LLM[External LLM API]
+  SOP --- DB[(PostgreSQL)]
+  TAG --- IDX[(Search/Trigram)]
+  WR --> Q[(Queue)] --> WR
+  EXP[Export Svc] --- OBJ[(Object Storage)]
+```

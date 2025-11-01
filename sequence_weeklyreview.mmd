@@ -1,0 +1,10 @@
+```mermaid
+sequenceDiagram
+  participant SCH as Scheduler (Fri 16:00)
+  participant AGG as Stats Aggregator
+  participant WR as WeeklyReview Svc
+  participant N as Notification
+  SCH->>AGG: fetch weekly usage
+  AGG->>WR: generate draft(JSON)
+  WR-->>N: send in-app/email
+```

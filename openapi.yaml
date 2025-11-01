@@ -1,0 +1,83 @@
+openapi: 3.0.3
+get:
+summary: List PDCA by sopId
+parameters:
+- in: query
+name: sopId
+schema: { type: string, format: uuid }
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema:
+type: array
+items: { $ref: '#/components/schemas/Pdca' }
+
+
+/pdca/{id}/diff:
+post:
+summary: Generate SOP Diff from PDCA
+parameters: [ { $ref: '#/components/parameters/PdcaId' } ]
+responses:
+'200': { description: Diff generated }
+
+
+/tags/suggest:
+post:
+summary: Get AI tag suggestions
+requestBody:
+content:
+application/json:
+schema: { $ref: '#/components/schemas/TagSuggestionRequest' }
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema: { $ref: '#/components/schemas/TagSuggestionResponse' }
+
+
+/inbox:
+post:
+summary: Add inbox item
+requestBody:
+content:
+application/json:
+schema:
+type: object
+properties:
+text: { type: string }
+responses:
+'201': { description: Created }
+
+
+/inbox/{id}/to-sop:
+post:
+summary: Convert inbox item to SOP draft
+parameters:
+- name: id
+in: path
+required: true
+schema: { type: string, format: uuid }
+responses:
+'201': { description: Created }
+
+
+/weekly-review/generate:
+get:
+summary: Manually trigger weekly review generation
+parameters:
+- in: query
+name: week
+schema: { type: string, example: '2025-45' }
+responses:
+'200': { description: Draft generated, content: { application/json: { schema: { $ref: '#/components/schemas/WeeklyReview' } } } }
+
+
+/weekly-review/{id}/publish:
+post:
+summary: Publish weekly review
+parameters: [ { $ref: '#/components/parameters/WeeklyReviewId' } ]
+responses:
+'200': { description: Published }

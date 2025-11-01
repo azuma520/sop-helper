@@ -1,0 +1,16 @@
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant G as API Gateway
+  participant C as Conversation Svc
+  participant M as Masking
+  participant L as LLM API
+  participant S as SOP Svc
+  U->>G: POST /conversation/parse
+  G->>C: route(payload)
+  C->>M: redact PII
+  M->>L: prompt(actions draft)
+  L-->>C: actions[], cautions[], errors[]
+  C-->>S: createDraft(actions)
+  S-->>U: SOP draft (cards)
+```
