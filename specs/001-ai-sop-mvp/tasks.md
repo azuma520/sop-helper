@@ -52,7 +52,7 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [x] T006 設計 PostgreSQL schema 與 migration（users/organizations/inbox_items/actions/projects/sops/sop_versions/pdca/weekly_reviews/tags/audit_logs），加上必要索引與 RLS 政策。
 - [x] T007 [P] 實作 `packages/infra/db`（Prisma/TypeORM 選擇）並設定審計欄位與多租戶過濾。
 - [x] T008 [P] 建立 `packages/infra/masking`：提供 LLM 前遮罩函式、redactions 記錄與單元測試。
-- [ ] T009 建構 `packages/telemetry`（OpenTelemetry SDK + Grafana Cloud 匯流設定），並新增 `docs/observability.md` 說明。
+- [x] T009 建構 `packages/telemetry`（OpenTelemetry SDK + Grafana Cloud 匯流設定），並新增 `docs/observability.md` 說明。
 - [ ] T010 實作 BullMQ + node-cron 基礎流程（`packages/workflows/scheduler`），含 10m/60m 重試與任務審計表。
 - [ ] T011 [P] 建立 API Gateway / AuthN 結構（JWT/OIDC middleware、RBAC decorator、Rate limit policy 在 `apps/api/src/common/`）。
 - [ ] T012 導入 `contracts/openapi.yaml` 為 NestJS OpenAPI 來源，並新增 CI 腳本 `pnpm test:contract`（Dredd）。
