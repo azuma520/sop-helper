@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Prisma model definitions are provided for reference. We will rely on SQL migrations
@@ -216,6 +217,8 @@ model PDCA {
   phaseDo     Json
   phaseCheck  Json
   phaseAct    Json
+  actAcknowledgeInsight Json?
+  actActionChange       Json?
   diffJson    Json?
   status      PDCAStatus @default(draft)
   createdBy   User   @relation("PDCACreator", fields: [createdById], references: [id])

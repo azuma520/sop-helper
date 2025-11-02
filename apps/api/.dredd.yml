@@ -1,0 +1,35 @@
+# Dredd API Contract Testing Configuration
+# Tests API implementation against OpenAPI specification
+
+language: node
+sandbox: false
+require: []
+before:
+  hooks: []
+after:
+  hooks: []
+
+reporter:
+  - api
+  - cli
+
+output:
+  - ./dredd-report.md
+
+# OpenAPI specification location
+blueprint: ../../../specs/001-ai-sop-mvp/contracts/openapi.yaml
+
+# API endpoint
+endpoint: http://localhost:3000/api/v1
+
+# HTTP headers for authentication (if needed)
+# headers:
+#   Authorization: Bearer YOUR_JWT_TOKEN
+
+# Skip certain endpoints during development
+# skip:
+#   - /health
+
+# Color output
+color: true
+

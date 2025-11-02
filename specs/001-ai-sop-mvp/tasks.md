@@ -54,12 +54,12 @@ description: "Task list for AI SOP MVP Workflow Enablement feature implementatio
 - [x] T008 [P] 建立 `packages/infra/masking`：提供 LLM 前遮罩函式、redactions 記錄與單元測試。
 - [x] T009 建構 `packages/telemetry`（OpenTelemetry SDK + Grafana Cloud 匯流設定），並新增 `docs/observability.md` 說明。
 - [x] T010 實作 BullMQ + node-cron 基礎流程（`packages/workflows/scheduler`），含 10m/60m 重試與任務審計表。
-- [ ] T010A [P] 更新 Prisma / SQL migration：`pdca` 表新增 `act_acknowledge_insight`、`act_action_change` 欄位並維持 RLS 與索引。
-- [ ] T010B 同步調整 `contracts/openapi.yaml`、`packages/domain/pdca` 型別與 `apps/api` DTO，支援新欄位。
-- [ ] T011 [P] 建立 API Gateway / AuthN 結構（JWT/OIDC middleware、RBAC decorator、Rate limit policy 在 `apps/api/src/common/`）。
-- [ ] T012 導入 `contracts/openapi.yaml` 為 NestJS OpenAPI 來源，並新增 CI 腳本 `pnpm test:contract`（Dredd）。
-- [ ] T012A [P] 建立 `packages/domain/tagging` 與 `packages/infra/tagging`：定義標籤建議輸入/輸出模型、Reviewer 審核欄位與審計記錄。
-- [ ] T012B 建立 `apps/api/src/tags` 模組：串接遮罩後的 LLM 建議、儲存候選標籤、提供覆核/commit API，並撰寫單元測試。
+- [x] T010A [P] 更新 Prisma / SQL migration：`pdca` 表新增 `act_acknowledge_insight`、`act_action_change` 欄位並維持 RLS 與索引。
+- [x] T010B 同步調整 `contracts/openapi.yaml`、`packages/domain/pdca` 型別與 `apps/api` DTO，支援新欄位。
+- [x] T011 [P] 建立 API Gateway / AuthN 結構（JWT/OIDC middleware、RBAC decorator、Rate limit policy 在 `apps/api/src/common/`）。
+- [x] T012 導入 `contracts/openapi.yaml` 為 NestJS OpenAPI 來源，並新增 CI 腳本 `pnpm test:contract`（Dredd）。
+- [x] T012A [P] 建立 `packages/domain/tagging` 與 `packages/infra/tagging`：定義標籤建議輸入/輸出模型、Reviewer 審核欄位與審計記錄。
+- [x] T012B 建立 `apps/api/src/tags` 模組：串接遮罩後的 LLM 建議、儲存候選標籤、提供覆核/commit API，並撰寫單元測試。
 
 **Checkpoint**: DB schema 部署、遮罩、觀測、排程、認證皆完成並具單元測試。
 

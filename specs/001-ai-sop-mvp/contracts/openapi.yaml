@@ -163,6 +163,12 @@ components:
           type: object
         phaseAct:
           type: object
+        actAcknowledgeInsight:
+          type: object
+          description: 記錄 Act phase 中確認的洞察與學習，供 Reviewer 審核
+        actActionChange:
+          type: object
+          description: 記錄 Act phase 中的行動變更決策，包含後續假設與追蹤項
         diffJson:
           type: object
     WeeklyReview:
@@ -468,6 +474,12 @@ paths:
                   type: object
                 act:
                   type: object
+                actAcknowledgeInsight:
+                  type: object
+                  description: 記錄 Act phase 中確認的洞察與學習
+                actActionChange:
+                  type: object
+                  description: 記錄 Act phase 中的行動變更決策
       responses:
         '201':
           description: PDCA created.
@@ -493,6 +505,44 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PDCA'
+
+  /pdca/{id}:
+    patch:
+      tags: [PDCA]
+      summary: Update PDCA record, including act_acknowledge_insight and act_action_change fields.
+      parameters:
+        - $ref: '#/components/parameters/PdcaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: object
+                do:
+                  type: object
+                check:
+                  type: object
+                act:
+                  type: object
+                actAcknowledgeInsight:
+                  type: object
+                  description: 更新 Act phase 中確認的洞察與學習
+                actActionChange:
+                  type: object
+                  description: 更新 Act phase 中的行動變更決策
+                status:
+                  type: string
+                  enum: [draft, in_review, closed]
+      responses:
+        '200':
+          description: PDCA updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PDCA'
 
   /pdca/{id}/diff:
     post:
