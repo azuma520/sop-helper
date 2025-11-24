@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",
-    "@sentry/node": "^10.22.0",
+    "@sentry/node": "^10.27.0",
     "winston": "^3.18.3"
   },
   "devDependencies": {
